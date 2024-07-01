@@ -35,7 +35,7 @@ public class BannedWordsHelper {
 
         // Compile the final pattern
         Pattern pattern = Pattern.compile(builder.toString());
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = pattern.matcher(text.toLowerCase());
 
         // Return the first match found
         if (matcher.find()) {

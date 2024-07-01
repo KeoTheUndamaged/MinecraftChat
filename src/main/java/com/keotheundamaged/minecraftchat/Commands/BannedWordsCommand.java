@@ -57,7 +57,7 @@ public class BannedWordsCommand  implements CommandExecutor {
 
         if (action.equals("add") || action.equals("remove")) {
             String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
-            String word = String.join(" ", newArgs);
+            String word = String.join(" ", newArgs).toLowerCase();
 
             try {
                 addOrRemoveWordToBannedList(action, word);
