@@ -1,5 +1,6 @@
 package com.keotheundamaged.minecraftchat.Common.Config;
 
+import com.keotheundamaged.minecraftchat.Common.Helpers.BannedWordsHelper;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,6 +17,7 @@ public class BannedWordsConfigManager {
     private final String fileName = "banned-words.yml";
     private File dateFile;
     private FileConfiguration config;
+    private String bannedWordsRegex;
 
 
     /**
@@ -39,6 +41,8 @@ public class BannedWordsConfigManager {
             plugin.saveResource(fileName, false);
         }
         config = YamlConfiguration.loadConfiguration(dateFile);
+        BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
+        bannedWordsRegex = bannedWordsHelper.generateBannedWordRegex(config.getStringList("bannedWords"));
     }
 
     /**
@@ -48,6 +52,8 @@ public class BannedWordsConfigManager {
     public void loadData() {
         if (dateFile.exists()) {
             config = YamlConfiguration.loadConfiguration(dateFile);
+            BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
+            bannedWordsRegex = bannedWordsHelper.generateBannedWordRegex(config.getStringList("bannedWords"));
         } else {
             plugin.getLogger().warning("Failing Loading Banned Words: File does not exist.");
         }
@@ -57,9 +63,12 @@ public class BannedWordsConfigManager {
      * Saves the configuration data to the banned words file.
      * Logs a severe error if an IOException occurs.
      */
-    public void saveData() {
+    public void saveData(boolean reload) {
         try {
             config.save(dateFile);
+            if (reload) {
+                loadData();
+            }
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Failing Saving Banned Words", e);
         }
@@ -72,5 +81,9 @@ public class BannedWordsConfigManager {
      */
     public FileConfiguration getConfig() {
         return this.config;
+    }
+
+    public String getBannedWordsRegex() {
+        return this.bannedWordsRegex;
     }
 }

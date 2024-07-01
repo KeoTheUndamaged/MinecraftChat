@@ -4,14 +4,11 @@ import com.keotheundamaged.minecraftchat.Common.Config.BannedWordsConfigManager;
 import com.keotheundamaged.minecraftchat.Common.Config.DiscordConfigManager;
 import com.keotheundamaged.minecraftchat.Common.Connectors.DiscordConnector;
 import com.keotheundamaged.minecraftchat.Common.Helpers.BannedWordsHelper;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 /**
  * Handles sign-related events for the Minecraft plugin.
@@ -53,11 +50,11 @@ public class SignEvents implements Listener {
         if (signContent.isEmpty()) {return;} // if sign content is empty. Ignore.
         Player player = event.getPlayer(); // get player changing sign content
 
-        FileConfiguration config = bannedWordConfigManger.getConfig();
-        List<String> bannedWordsList = config.getStringList("bannedWords");
-
+        String bannedWordRegex = bannedWordConfigManger.getBannedWordsRegex();
         BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
-        String result = bannedWordsHelper.checkForBannedWords(signContent, bannedWordsList);
+        String result = bannedWordsHelper.checkForBannedWords(signContent, bannedWordRegex);
+
+        // if result is not null, it means a banned word was detected
         if (result != null) {
             event.setCancelled(true);
             plugin.getLogger().info(String.format("%s [%s] used a banned word (%s) in %s on a sign",

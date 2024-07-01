@@ -86,6 +86,6 @@ public final class MinecraftChat extends JavaPlugin {
         discordConnector.sendMessageToChannel(chatChannel, "Server shutting down");
         discordConnector.shutdown();
         discordConfigManager.saveData();
-        bannedWordsConfigManager.saveData();
+        bannedWordsConfigManager.saveData(false);
     }
 }

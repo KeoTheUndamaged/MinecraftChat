@@ -5,7 +5,6 @@ import com.keotheundamaged.minecraftchat.Common.Config.DiscordConfigManager;
 import com.keotheundamaged.minecraftchat.Common.Connectors.DiscordConnector;
 import com.keotheundamaged.minecraftchat.Common.Helpers.BannedWordsHelper;
 import com.keotheundamaged.minecraftchat.Common.Helpers.WordExtractorHelper;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,19 +41,27 @@ public class BookEvents implements Listener {
         this.reportChannelId = discordConfigManager.getConfig().getString("reportChannel");
     }
 
+    /**
+     * Handles the PlayerEditBookEvent, to check for banned words in the contents or signed title of a book
+     *
+     * @param event  the player edit book event
+     */
     @EventHandler
     public void onPlayerEditBook(PlayerEditBookEvent event) {
         Player player = event.getPlayer();
         List<String> pages = event.getNewBookMeta().getPages();
         String pageContent = String.join(" ", pages);
 
-        FileConfiguration config = bannedWordConfigManger.getConfig();
-        List<String> bannedWordsList = config.getStringList("bannedWords");
-
+        String bannedWordRegex = bannedWordConfigManger.getBannedWordsRegex();
         BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
-        String result = bannedWordsHelper.checkForBannedWords(pageContent, bannedWordsList);
+        String result = bannedWordsHelper.checkForBannedWords(pageContent, bannedWordRegex);
+
+        // As books can contain a large number of characters restrict the output being logged to 10 words either side
+        // of the banned word
         WordExtractorHelper wordExtractorHelper = new WordExtractorHelper();
         String contentToLog = wordExtractorHelper.getSurroundingWords(pageContent, result, 10);
+
+        // if result is not null, it means a banned word was detected
         if (result != null) {
             event.setCancelled(true);
             plugin.getLogger().info(String.format("%s [%s] used a banned word (%s) in %s on a sign",

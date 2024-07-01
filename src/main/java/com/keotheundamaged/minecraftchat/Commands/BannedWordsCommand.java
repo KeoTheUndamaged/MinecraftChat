@@ -108,6 +108,6 @@ public class BannedWordsCommand  implements CommandExecutor {
             }
         }
         bannedWordsConfigManager.getConfig().set("bannedWords", bannedWords);
-        bannedWordsConfigManager.saveData();
+        bannedWordsConfigManager.saveData(true);
     }
 }
