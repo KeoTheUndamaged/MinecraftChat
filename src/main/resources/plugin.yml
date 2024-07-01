@@ -1,0 +1,8 @@
+name: MinecraftChat
+version: '${project.version}'
+main: com.keotheundamaged.minecraftchat.MinecraftChat
+api-version: '1.21'
+commands:
+  blacklist:
+
+  discord:
