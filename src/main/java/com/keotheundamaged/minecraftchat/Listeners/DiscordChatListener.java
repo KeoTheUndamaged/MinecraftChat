@@ -1,5 +1,6 @@
-package com.keotheundamaged.minecraftchat.Discord;
+package com.keotheundamaged.minecraftchat.Listeners;
 
+import com.keotheundamaged.minecraftchat.Helpers.BannedWordsHelper;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,7 +10,7 @@ import org.bukkit.Bukkit;
 /**
  * Listens for messages in a specific Discord channel and broadcasts them to the Minecraft server chat.
  */
-public class ChatListener extends ListenerAdapter {
+public class DiscordChatListener extends ListenerAdapter {
     private final String channelId;
 
     /**
@@ -17,7 +18,7 @@ public class ChatListener extends ListenerAdapter {
      *
      * @param channelId the ID of the Discord channel to listen for messages
      */
-    public ChatListener(String channelId) {
+    public DiscordChatListener(String channelId) {
         this.channelId = channelId;
     }
 
@@ -39,6 +40,10 @@ public class ChatListener extends ListenerAdapter {
             Message message = event.getMessage();
             String content = message.getContentDisplay();
             System.out.println(content);
+
+            BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
+            String result = bannedWordsHelper.checkForBannedWords(content);
+            if (result != null) return;
             Bukkit.getServer().broadcastMessage(String.format("[%s] %s", event.getAuthor().getEffectiveName(), content));
         }
     }

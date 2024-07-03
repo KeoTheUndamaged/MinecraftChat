@@ -1,3 +1,7 @@
-bannedWords:
-- test
-- bad
+EXACT_BANNED_WORDS:
+  - test
+  - rat
+WILDCARD_BANNED_WORDS:
+  - bad
+  - rain
+  - mud

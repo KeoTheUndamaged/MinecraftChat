@@ -1,4 +1,4 @@
-package com.keotheundamaged.minecraftchat.Common.Helpers;
+package com.keotheundamaged.minecraftchat.Helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
