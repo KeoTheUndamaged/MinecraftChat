@@ -2,22 +2,28 @@ package com.keotheundamaged.minecraftchat.Events;
 
 import com.keotheundamaged.minecraftchat.Helpers.BannedWordsHelper;
 import com.keotheundamaged.minecraftchat.Helpers.DiscordHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SignEvents implements Listener {
     private final DiscordHelper discord;
+    private final BannedWordsHelper bannedWordsHelper;
+
     public SignEvents() {
-        this.discord = new DiscordHelper(false);
+        JavaPlugin plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin("MinecraftChat");
+        this.discord = DiscordHelper.getInstance(plugin);
+        this.bannedWordsHelper = BannedWordsHelper.getInstance(plugin);
     }
+
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
         String signContent = String.join(" ", event.getLines()); // get content of sign being changed
 
-        BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
         String result = bannedWordsHelper.checkForBannedWords(signContent);
 
         if (result != null) {

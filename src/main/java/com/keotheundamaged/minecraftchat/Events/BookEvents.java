@@ -3,15 +3,22 @@ package com.keotheundamaged.minecraftchat.Events;
 import com.keotheundamaged.minecraftchat.Helpers.BannedWordsHelper;
 import com.keotheundamaged.minecraftchat.Helpers.DiscordHelper;
 import com.keotheundamaged.minecraftchat.Helpers.WordExtractorHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class BookEvents implements Listener {
     private final DiscordHelper discord;
+    private final BannedWordsHelper bannedWordsHelper;
+
     public BookEvents() {
-        this.discord = new DiscordHelper(false);
+        JavaPlugin plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin("MinecraftChat");
+        this.discord = DiscordHelper.getInstance(plugin);
+        this.bannedWordsHelper = BannedWordsHelper.getInstance(plugin);
+
     }
     @EventHandler
     public void onPlayerEditBook(PlayerEditBookEvent event) {
@@ -19,7 +26,6 @@ public class BookEvents implements Listener {
         String content = String.join(" ", event.getNewBookMeta().getPages());
         String title = event.getNewBookMeta().getTitle();
 
-        BannedWordsHelper bannedWordsHelper = new BannedWordsHelper();
         String result = bannedWordsHelper.checkForBannedWords(content);
         String titleResult = bannedWordsHelper.checkForBannedWords(title);
 

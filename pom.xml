@@ -6,7 +6,7 @@
 
   <groupId>com.keotheundamaged</groupId>
   <artifactId>MinecraftChat</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-Alpha</version>
   <packaging>jar</packaging>
 
   <name>Minecraft Chat</name>

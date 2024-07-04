@@ -1,6 +1,5 @@
 package com.keotheundamaged.minecraftchat.Helpers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,8 +13,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class BannedWordsHelper {
+    private static BannedWordsHelper instance;
+
     private final JavaPlugin plugin;
     private File file;
     private FileConfiguration config;
@@ -32,13 +32,21 @@ public class BannedWordsHelper {
     private final Pattern IP_COMPILED_PATTERN = Pattern.compile(IP_PATTERN);
     private final Pattern MASKED_LINK_PATTERN = Pattern.compile(MASK_LINK_PATTERN);
 
-    public BannedWordsHelper() {
-        this.plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin("MinecraftChat");
+    private BannedWordsHelper(JavaPlugin plugin) {
+        this.plugin = plugin;
         getOrCreateDataFile();
         loadData();
+        createPatterns();
     }
 
-    public void getOrCreateDataFile() {
+    public static synchronized BannedWordsHelper getInstance(JavaPlugin plugin) {
+        if (instance == null) {
+            instance = new BannedWordsHelper(plugin);
+        }
+        return instance;
+    }
+
+    private void getOrCreateDataFile() {
         String filename = "banned-words.yml";
         this.file = new File(this.plugin.getDataFolder(), filename);
         if (!this.file.exists()) {
@@ -46,34 +54,37 @@ public class BannedWordsHelper {
             this.plugin.saveResource(filename, false);
         }
     }
-    public void loadData() {
+
+    private void loadData() {
         if (this.file.exists()) {
             this.config = YamlConfiguration.loadConfiguration(this.file);
             this.EXACT_BANNED_WORDS = this.config.getStringList("EXACT_BANNED_WORDS");
             this.WILDCARD_BANNED_WORDS = this.config.getStringList("WILDCARD_BANNED_WORDS");
-
-            for (String word : this.EXACT_BANNED_WORDS) {
-                String regex = "\\b" + Pattern.quote(word) + "\\b";
-                this.EXACT_BANNED_PATTERNS.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
-            }
-
-            for (String word : this.WILDCARD_BANNED_WORDS) {
-                String regex = Pattern.quote(word) + ".*";
-                this.WILDCARD_BANNED_PATTERNS.put(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), word);
-            }
+            createPatterns();
         }
     }
 
-    public void saveData(boolean reload) {
+    private void createPatterns() {
+        this.EXACT_BANNED_PATTERNS.clear();
+        for (String word : this.EXACT_BANNED_WORDS) {
+            String regex = "\\b" + Pattern.quote(word) + "\\b";
+            this.EXACT_BANNED_PATTERNS.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+        }
+
+        this.WILDCARD_BANNED_PATTERNS.clear();
+        for (String word : this.WILDCARD_BANNED_WORDS) {
+            String regex = Pattern.quote(word) + ".*";
+            this.WILDCARD_BANNED_PATTERNS.put(Pattern.compile(regex, Pattern.CASE_INSENSITIVE), word);
+        }
+    }
+
+    public void saveData() {
         try {
             this.config.set("EXACT_BANNED_WORDS", this.EXACT_BANNED_WORDS);
             this.config.set("WILDCARD_BANNED_WORDS", this.WILDCARD_BANNED_WORDS);
             this.config.save(this.file);
-            if (reload) {
-                loadData();
-            }
         } catch (IOException e) {
-            this.plugin.getLogger().severe(String.format("Failed to save Banned words config to %s", this.file.getName()));
+            this.plugin.getLogger().severe(String.format("Failed to save banned words config to %s", this.file.getName()));
         }
     }
 
@@ -115,23 +126,28 @@ public class BannedWordsHelper {
     public void addToExactBannedWords(String word) throws Exception {
         if (this.EXACT_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s already exists", word));
         this.EXACT_BANNED_WORDS.add(word);
-        saveData(true);
+        saveData();
+        createPatterns(); // Recreate patterns
     }
 
     public void addToWildcardBannedWords(String word) throws Exception {
         if (this.WILDCARD_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s already exists", word));
         this.WILDCARD_BANNED_WORDS.add(word);
-        saveData(true);
+        saveData();
+        createPatterns(); // Recreate patterns
     }
 
     public void removeFromExactBannedWords(String word) throws Exception {
         if (!this.EXACT_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s not found", word));
         this.EXACT_BANNED_WORDS.remove(word);
-        saveData(true);
+        saveData();
+        createPatterns(); // Recreate patterns
     }
 
     public void removeFromWildcardBannedWords(String word) throws Exception {
         if (!this.WILDCARD_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s not found", word));
-        saveData(true);
+        this.WILDCARD_BANNED_WORDS.remove(word);
+        saveData();
+        createPatterns(); // Recreate patterns
     }
 }

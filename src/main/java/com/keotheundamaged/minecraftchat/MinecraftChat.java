@@ -15,8 +15,8 @@ public final class MinecraftChat extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.bannedWordsHelper = new BannedWordsHelper();
-        this.discord = new DiscordHelper(true);
+        this.discord = DiscordHelper.getInstance(this);
+        this.bannedWordsHelper = BannedWordsHelper.getInstance(this);
 
         this.discord.sendChatMessage(":green_circle: | Starting server");
 
@@ -30,7 +30,7 @@ public final class MinecraftChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.bannedWordsHelper.saveData(false);
+        this.bannedWordsHelper.saveData();
 
         this.discord.sendChatMessage(":red_circle: | Stopping server");
         this.discord.saveData(false);

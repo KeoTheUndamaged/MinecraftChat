@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.time.Instant;
 
 public class DiscordHelper {
+    private static DiscordHelper instance;
+
     private final JavaPlugin plugin;
     private File file;
     private FileConfiguration config;
@@ -27,16 +29,15 @@ public class DiscordHelper {
     private String CHAT_CHANNEL_ID;
     private String REPORT_CHANNEL_ID;
 
-    public DiscordHelper(boolean registerListener) {
-        this.plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin("MinecraftChat");
+    private DiscordHelper(JavaPlugin plugin) {
+        this.plugin = plugin;
         getOrCreateDataFile();
         loadData();
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(this.TOKEN)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT);
-        if (registerListener) {
-            jdaBuilder.addEventListeners(new DiscordChatListener(this.CHAT_CHANNEL_ID));
-        }
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .addEventListeners(new DiscordChatListener(this.CHAT_CHANNEL_ID));
+
         this.jda = jdaBuilder.build();
         try {
             this.jda.awaitReady();
@@ -46,6 +47,13 @@ public class DiscordHelper {
                     e.getMessage()
             ));
         }
+    }
+
+    public static synchronized DiscordHelper getInstance(JavaPlugin plugin) {
+        if (instance == null) {
+            instance = new DiscordHelper(plugin);
+        }
+        return instance;
     }
 
     public void getOrCreateDataFile() {
