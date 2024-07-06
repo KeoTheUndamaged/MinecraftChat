@@ -74,15 +74,12 @@ public class DiscordHelper {
         }
     }
 
-    public void saveData(boolean reload) {
+    public void saveData() {
         try {
             this.config.set("CHAT_CHANNEL_ID", this.CHAT_CHANNEL_ID);
             this.config.set("REPORT_CHANNEL_ID", this.REPORT_CHANNEL_ID);
             this.config.set("TOKEN", this.TOKEN);
             this.config.save(this.file);
-            if (reload) {
-                loadData();
-            }
         } catch (IOException e) {
             this.plugin.getLogger().severe(String.format("Failed to save Banned words config to %s", this.file.getName()));
         }

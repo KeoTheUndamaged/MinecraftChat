@@ -150,4 +150,11 @@ public class BannedWordsHelper {
         saveData();
         createPatterns(); // Recreate patterns
     }
+
+    public String getExactBannedWords() {
+        return String.join(", ", this.EXACT_BANNED_WORDS);
+    }
+    public String getWildcardBannedWords() {
+        return String.join(", ", this.WILDCARD_BANNED_WORDS);
+    }
 }

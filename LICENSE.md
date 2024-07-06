@@ -1,4 +1,4 @@
-Sure! Here's an improved version of the README with additional helpful details:
+Here's the updated README with a section on how to use the `/blacklist` commands:
 
 # Minecraft Chat Plugin
 ### Spigot-based Plugin
@@ -79,24 +79,75 @@ Messages sent from Discord are subject to the same banned words filtering as the
 - **CHAT_CHANNEL_ID**: The ID of the Discord channel for Minecraft chat.
 - **REPORT_CHANNEL_ID**: The ID of the Discord channel for reporting banned words violations.
 
-## Usage
+## Commands
+### /blacklist Command
 
-- **Chat Filtering**: The plugin will automatically filter chat messages and other inputs based on your configuration.
-- **Discord Integration**: Any messages sent in the specified Discord channel will appear in Minecraft chat and vice versa.
+The `/blacklist` command allows server administrators to manage the banned words list directly from within the game. The following subcommands are available:
+
+#### Add a Banned Word
+To add a word to the banned words list:
+
+```plaintext
+/blacklist add <exact|wildcard> <word>
+```
+
+**Examples:**
+- To add an exact banned word:
+  ```plaintext
+  /blacklist add exact mine
+  ```
+
+- To add a wildcard banned word:
+  ```plaintext
+  /blacklist add wildcard rain
+  ```
+
+#### Remove a Banned Word
+To remove a word from the banned words list:
+
+```plaintext
+/blacklist remove <exact|wildcard> <word>
+```
+
+**Examples:**
+- To remove an exact banned word:
+  ```plaintext
+  /blacklist remove exact mine
+  ```
+
+- To remove a wildcard banned word:
+  ```plaintext
+  /blacklist remove wildcard rain
+  ```
+
+#### List Banned Words
+*This feature is not implemented yet.*
+
+**Command:**
+```plaintext
+/blacklist list
+```
 
 ## Development
 This plugin is under active development. Contributions and feedback are welcome.
 
 ### Building the Plugin
-1. Clone the repository.
+1. Clone the repository.  
+   HTTP
    ```sh
-   git clone https://github.com/yourusername/MinecraftChat.git
+   git clone https://github.com/KeoTheUndamaged/MinecraftChat.git
    ```
+   SSH
+
+   ```sh
+   git clone git@github.com:KeoTheUndamaged/MinecraftChat.git
+   ```
+   
 2. Navigate to the project directory.
    ```sh
    cd MinecraftChat
    ```
-3. Build the project using your preferred build tool (e.g., Maven or Gradle).
+3. Build the project using your preferred build tool.
    ```sh
    mvn clean install
    ```
@@ -105,9 +156,3 @@ This plugin is under active development. Contributions and feedback are welcome.
 1. Fork the repository.
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of your changes.
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Support
-For support and troubleshooting, please open an issue on the GitHub repository or join our Discord server (link to be added).

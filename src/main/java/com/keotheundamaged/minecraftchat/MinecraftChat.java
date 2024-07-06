@@ -33,6 +33,6 @@ public final class MinecraftChat extends JavaPlugin {
         this.bannedWordsHelper.saveData();
 
         this.discord.sendChatMessage(":red_circle: | Stopping server");
-        this.discord.saveData(false);
+        this.discord.saveData();
     }
 }

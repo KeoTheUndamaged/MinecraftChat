@@ -33,7 +33,16 @@ public class BannedWordsCommands implements CommandExecutor {
         String action = args[0];
 
         if (action.equalsIgnoreCase("list")) {
-            player.sendMessage("Not implemented yet");
+            String exactWords = bannedWordsHelper.getExactBannedWords();
+            String wildcardWords = bannedWordsHelper.getWildcardBannedWords();
+
+            player.sendMessage("Banned words:");
+            player.sendMessage("---------------------");
+            player.sendMessage(String.format("%s Exact: %s", ChatColor.YELLOW, exactWords));
+            player.sendMessage(" ");
+            player.sendMessage(String.format("%s Wildcard: %s", ChatColor.YELLOW, wildcardWords));
+            player.sendMessage("---------------------");
+
             return true;
         }
 
