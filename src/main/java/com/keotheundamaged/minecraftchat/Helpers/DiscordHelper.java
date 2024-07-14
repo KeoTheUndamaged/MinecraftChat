@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 
+/**
+ * Helper class to manage interactions with Discord.
+ */
 public class DiscordHelper {
     private static DiscordHelper instance;
 
@@ -29,6 +32,11 @@ public class DiscordHelper {
     private String CHAT_CHANNEL_ID;
     private String REPORT_CHANNEL_ID;
 
+    /**
+     * Private constructor to initialize the DiscordHelper.
+     *
+     * @param plugin The JavaPlugin instance.
+     */
     private DiscordHelper(JavaPlugin plugin) {
         this.plugin = plugin;
         getOrCreateDataFile();
@@ -49,6 +57,12 @@ public class DiscordHelper {
         }
     }
 
+    /**
+     * Gets the singleton instance of the DiscordHelper.
+     *
+     * @param plugin The JavaPlugin instance.
+     * @return The DiscordHelper instance.
+     */
     public static synchronized DiscordHelper getInstance(JavaPlugin plugin) {
         if (instance == null) {
             instance = new DiscordHelper(plugin);
@@ -56,6 +70,9 @@ public class DiscordHelper {
         return instance;
     }
 
+    /**
+     * Creates or loads the data file for Discord configuration.
+     */
     public void getOrCreateDataFile() {
         String filename = "discord.yml";
         this.file = new File(this.plugin.getDataFolder(), filename);
@@ -65,6 +82,9 @@ public class DiscordHelper {
         }
     }
 
+    /**
+     * Loads data from the configuration file.
+     */
     public void loadData() {
         if (this.file.exists()) {
             this.config = YamlConfiguration.loadConfiguration(this.file);
@@ -74,6 +94,9 @@ public class DiscordHelper {
         }
     }
 
+    /**
+     * Saves data to the configuration file.
+     */
     public void saveData() {
         try {
             this.config.set("CHAT_CHANNEL_ID", this.CHAT_CHANNEL_ID);
@@ -81,10 +104,15 @@ public class DiscordHelper {
             this.config.set("TOKEN", this.TOKEN);
             this.config.save(this.file);
         } catch (IOException e) {
-            this.plugin.getLogger().severe(String.format("Failed to save Banned words config to %s", this.file.getName()));
+            this.plugin.getLogger().severe(String.format("Failed to save Discord config to %s", this.file.getName()));
         }
     }
 
+    /**
+     * Sends a chat message to the configured Discord channel.
+     *
+     * @param message The message to send.
+     */
     public void sendChatMessage(String message) {
         TextChannel channel = jda.getTextChannelById(this.CHAT_CHANNEL_ID);
         if (channel == null) {
@@ -92,12 +120,20 @@ public class DiscordHelper {
             return;
         }
         try {
-        channel.sendMessage(message).queue();
+            channel.sendMessage(message).queue();
         } catch (Exception e) {
             Bukkit.getServer().getLogger().severe(String.format("Failed to send message to Discord: %s", e.getMessage()));
         }
     }
 
+    /**
+     * Sends a report message to the configured Discord channel.
+     *
+     * @param player    The player who caused the report.
+     * @param message   The report message.
+     * @param textArea  The area where the violation occurred.
+     * @param violation The specific violation.
+     */
     public void sendReportMessage(Player player, String message, String textArea, String violation) {
         TextChannel channel = jda.getTextChannelById(this.REPORT_CHANNEL_ID);
         if (channel == null) {
@@ -114,8 +150,8 @@ public class DiscordHelper {
                 .addField("Reason", "Banned word", true)
                 .addField("Violation", violation, true)
                 .setTimestamp(now)
-                .setFooter(String.format("uuid: %s", player.getUniqueId()
-                ));
+                .setFooter(String.format("uuid: %s", player.getUniqueId()));
+
         try {
             channel.sendMessageEmbeds(embed.build()).queue();
         } catch (Exception e) {
@@ -123,6 +159,12 @@ public class DiscordHelper {
         }
     }
 
+    /**
+     * Determines the title for the embed based on the text area.
+     *
+     * @param textArea The area where the violation occurred.
+     * @return The title for the embed.
+     */
     private String getEmbedTitle(String textArea) {
         switch (textArea) {
             case "chat":

@@ -12,27 +12,45 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+/**
+ * Command executor for managing banned words in Minecraft chat.
+ */
 public class BannedWordsCommands implements CommandExecutor {
     private final BannedWordsHelper bannedWordsHelper;
 
+    /**
+     * Constructor for BannedWordsCommands.
+     * Initializes the BannedWordsHelper instance.
+     */
     public BannedWordsCommands() {
         JavaPlugin plugin = (JavaPlugin) Bukkit.getPluginManager().getPlugin("MinecraftChat");
         this.bannedWordsHelper = BannedWordsHelper.getInstance(plugin);
     }
 
+    /**
+     * Handles commands for managing banned words.
+     *
+     * @param sender  The sender of the command.
+     * @param command The command that was executed.
+     * @param label   The alias of the command that was used.
+     * @param args    The arguments passed with the command.
+     * @return true if the command was executed successfully, false otherwise.
+     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) return true;
+        if (!(sender instanceof Player)) return true; // Only allow players to use the command
         Player player = (Player) sender;
-        if (!player.hasPermission("minecraftchat.admin")) return true;
+        if (!player.hasPermission("minecraftchat.admin")) return true; // Only allow players with the correct permission to use the command
 
         if (args.length == 0) {
             player.sendMessage(String.format("%s missing arguments", ChatColor.YELLOW));
+            return true;
         }
 
         String action = args[0];
 
         if (action.equalsIgnoreCase("list")) {
+            // List all exact and wildcard banned words
             String exactWords = bannedWordsHelper.getExactBannedWords();
             String wildcardWords = bannedWordsHelper.getWildcardBannedWords();
 
@@ -51,25 +69,28 @@ public class BannedWordsCommands implements CommandExecutor {
             String bannedWordType = args[1];
 
             if (action.equalsIgnoreCase("add")) {
+                // Add a word to the exact or wildcard banned words list
                 if (bannedWordType.equalsIgnoreCase("exact")) {
                     bannedWordsHelper.addToExactBannedWords(word);
-                }
-                if (bannedWordType.equalsIgnoreCase("wildcard")) {
+                } else if (bannedWordType.equalsIgnoreCase("wildcard")) {
                     bannedWordsHelper.addToWildcardBannedWords(word);
                 }
-            }
-            if (action.equalsIgnoreCase("remove")) {
+                player.sendMessage(String.format("%s Added %s to %s banned words", ChatColor.GREEN, word, bannedWordType));
+            } else if (action.equalsIgnoreCase("remove")) {
+                // Remove a word from the exact or wildcard banned words list
                 if (bannedWordType.equalsIgnoreCase("exact")) {
                     bannedWordsHelper.removeFromExactBannedWords(word);
-                }
-                if (bannedWordType.equalsIgnoreCase("wildcard")) {
+                } else if (bannedWordType.equalsIgnoreCase("wildcard")) {
                     bannedWordsHelper.removeFromWildcardBannedWords(word);
                 }
+                player.sendMessage(String.format("%s Removed %s from %s banned words", ChatColor.GREEN, word, bannedWordType));
+            } else {
+                player.sendMessage(String.format("%s Unknown action: %s", ChatColor.RED, action));
             }
         } catch (Exception e) {
             Bukkit.getServer().getLogger().warning(String.format("%s Failed to execute command: %s", ChatColor.RED, e.getMessage()));
-            player.sendMessage(e.getMessage());
+            player.sendMessage(String.format("%s Failed to execute command: %s", ChatColor.RED, e.getMessage()));
         }
-        return false;
+        return true;
     }
 }

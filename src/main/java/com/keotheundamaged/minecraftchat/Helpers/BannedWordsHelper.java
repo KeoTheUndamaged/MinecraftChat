@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Helper class to manage banned words in Minecraft chat.
+ */
 public class BannedWordsHelper {
     private static BannedWordsHelper instance;
 
@@ -32,6 +35,11 @@ public class BannedWordsHelper {
     private final Pattern IP_COMPILED_PATTERN = Pattern.compile(IP_PATTERN);
     private final Pattern MASKED_LINK_PATTERN = Pattern.compile(MASK_LINK_PATTERN);
 
+    /**
+     * Private constructor to initialize the BannedWordsHelper.
+     *
+     * @param plugin The JavaPlugin instance.
+     */
     private BannedWordsHelper(JavaPlugin plugin) {
         this.plugin = plugin;
         getOrCreateDataFile();
@@ -39,6 +47,12 @@ public class BannedWordsHelper {
         createPatterns();
     }
 
+    /**
+     * Gets the singleton instance of the BannedWordsHelper.
+     *
+     * @param plugin The JavaPlugin instance.
+     * @return The BannedWordsHelper instance.
+     */
     public static synchronized BannedWordsHelper getInstance(JavaPlugin plugin) {
         if (instance == null) {
             instance = new BannedWordsHelper(plugin);
@@ -46,6 +60,9 @@ public class BannedWordsHelper {
         return instance;
     }
 
+    /**
+     * Creates or loads the data file for banned words configuration.
+     */
     private void getOrCreateDataFile() {
         String filename = "banned-words.yml";
         this.file = new File(this.plugin.getDataFolder(), filename);
@@ -55,6 +72,9 @@ public class BannedWordsHelper {
         }
     }
 
+    /**
+     * Loads data from the configuration file.
+     */
     private void loadData() {
         if (this.file.exists()) {
             this.config = YamlConfiguration.loadConfiguration(this.file);
@@ -64,6 +84,9 @@ public class BannedWordsHelper {
         }
     }
 
+    /**
+     * Creates regex patterns for exact and wildcard banned words.
+     */
     private void createPatterns() {
         this.EXACT_BANNED_PATTERNS.clear();
         for (String word : this.EXACT_BANNED_WORDS) {
@@ -78,6 +101,9 @@ public class BannedWordsHelper {
         }
     }
 
+    /**
+     * Saves data to the configuration file.
+     */
     public void saveData() {
         try {
             this.config.set("EXACT_BANNED_WORDS", this.EXACT_BANNED_WORDS);
@@ -88,6 +114,12 @@ public class BannedWordsHelper {
         }
     }
 
+    /**
+     * Checks a message for any banned words or patterns.
+     *
+     * @param message The message to check.
+     * @return The banned word or pattern found, or null if none are found.
+     */
     public String checkForBannedWords(String message) {
         // Check exact matches
         for (Pattern pattern : this.EXACT_BANNED_PATTERNS) {
@@ -116,6 +148,7 @@ public class BannedWordsHelper {
             return "IP address";
         }
 
+        // Check for masked link
         if (this.MASKED_LINK_PATTERN.matcher(message).find()) {
             return "Masked link";
         }
@@ -123,6 +156,12 @@ public class BannedWordsHelper {
         return null;
     }
 
+    /**
+     * Adds a word to the exact banned words list.
+     *
+     * @param word The word to add.
+     * @throws Exception if the word already exists in the list.
+     */
     public void addToExactBannedWords(String word) throws Exception {
         if (this.EXACT_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s already exists", word));
         this.EXACT_BANNED_WORDS.add(word);
@@ -130,6 +169,12 @@ public class BannedWordsHelper {
         createPatterns(); // Recreate patterns
     }
 
+    /**
+     * Adds a word to the wildcard banned words list.
+     *
+     * @param word The word to add.
+     * @throws Exception if the word already exists in the list.
+     */
     public void addToWildcardBannedWords(String word) throws Exception {
         if (this.WILDCARD_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s already exists", word));
         this.WILDCARD_BANNED_WORDS.add(word);
@@ -137,6 +182,12 @@ public class BannedWordsHelper {
         createPatterns(); // Recreate patterns
     }
 
+    /**
+     * Removes a word from the exact banned words list.
+     *
+     * @param word The word to remove.
+     * @throws Exception if the word is not found in the list.
+     */
     public void removeFromExactBannedWords(String word) throws Exception {
         if (!this.EXACT_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s not found", word));
         this.EXACT_BANNED_WORDS.remove(word);
@@ -144,6 +195,12 @@ public class BannedWordsHelper {
         createPatterns(); // Recreate patterns
     }
 
+    /**
+     * Removes a word from the wildcard banned words list.
+     *
+     * @param word The word to remove.
+     * @throws Exception if the word is not found in the list.
+     */
     public void removeFromWildcardBannedWords(String word) throws Exception {
         if (!this.WILDCARD_BANNED_WORDS.contains(word)) throw new Exception(String.format("%s not found", word));
         this.WILDCARD_BANNED_WORDS.remove(word);
@@ -151,9 +208,20 @@ public class BannedWordsHelper {
         createPatterns(); // Recreate patterns
     }
 
+    /**
+     * Gets the exact banned words as a comma-separated string.
+     *
+     * @return The exact banned words.
+     */
     public String getExactBannedWords() {
         return String.join(", ", this.EXACT_BANNED_WORDS);
     }
+
+    /**
+     * Gets the wildcard banned words as a comma-separated string.
+     *
+     * @return The wildcard banned words.
+     */
     public String getWildcardBannedWords() {
         return String.join(", ", this.WILDCARD_BANNED_WORDS);
     }
